@@ -11,7 +11,35 @@ export const userRegister=async(req,res)=>{
         const boy = displayPicture || 'https://www.vecteezy.com/vector-art/439863-vector-users-icon?username=$(username)';
         const girl = displayPicture || 'https://www.vecteezy.com/vector-art/1993889-beautiful-latin-woman-avatar-character-icon?username=$(username);'
 
-    } catch (error) {
+        const newUser = new User({
+            fullname,
+            username,
+            email,
+            password:hashpassword,
+            gender,
+            displayPicture: gender=="male" ? boy: girl
+        })
+
+        if(newUser){
+            await newUser.save();
+
+        }else{
+            res.status(500).send({success: false, message:"Invalid User"})
+        }
         
+    res.status(201).send({
+        _id:newUser._id,
+        fullname:newUser.fullname,
+        username:newUser.username,
+        displayPicture:newUser.displayPicture,
+        email:newUser.email
+    })
+
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error
+        })
+        console.log(error);
     }
 }
