@@ -38,7 +38,7 @@ export const userRegister=async(req,res)=>{
     } catch (error) {
         res.status(500).send({
             success: false,
-            message: error
+            message: error              
         })
         console.log(error);
     }
