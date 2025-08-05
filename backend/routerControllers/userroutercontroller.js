@@ -3,6 +3,7 @@ import User from '../schema/users.js';
 import jwtwebToken from '../utils/jwtwebToken.js'
 
 export const userRegister=async(req,res)=>{
+    console.log("working")
     try {
         const{fullname, username, email, gender, password, displayPicture} = req.body;
         const user = await User.findOne({username,email});
