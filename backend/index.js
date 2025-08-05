@@ -1,29 +1,35 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import dbconnect from './DB/dbconnect.js';
-import authRouter from './route/authuser.js';
-import messageRouter from './route/messageRoute.js'
-import cookieParser from 'cookie-parser';
+import express from "express"
+import dotenv from 'dotenv'
+import dbConnect from "./DB/dbConnect.js";
+import authRouter from  './rout/authUser.js'
+import messageRouter from './rout/messageRout.js'
+import userRouter from './rout/userRout.js'
+import cookieParser from "cookie-parser";
+import path from "path";
 
-const app = express();
+import {app , server} from './Socket/socket.js'
+
+const __dirname = path.resolve();
 
 dotenv.config();
 
+
 app.use(express.json());
-app.use(cookieParser)
+app.use(cookieParser())
 
 app.use('/api/auth',authRouter)
 app.use('/api/message',messageRouter)
+app.use('/api/user',userRouter)
 
-app.get('/', (req,res) => {
-    res.send('Server is running');
+app.use(express.static(path.join(__dirname,"/frontend/dist")))
+
+app.get("*",(req,res)=>{
+    res.sendFile(path.join(__dirname,"frontend","dist","index.html"))
 })
 
+const PORT = process.env.PORT || 3000
 
-
-const PORT = process.env.PORT || 5050;
-
-app.listen(PORT, () => {
-    dbconnect();
+server.listen(PORT,()=>{
+    dbConnect();
     console.log(`Working at ${PORT}`);
-});
+})
