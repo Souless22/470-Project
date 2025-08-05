@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../schema/users.js';
-
+import jwtwebToken from '../utils/jwtwebToken.js'
 
 export const userRegister=async(req,res)=>{
     try {
@@ -22,6 +22,7 @@ export const userRegister=async(req,res)=>{
 
         if(newUser){
             await newUser.save();
+            jwtToken(newUser._id,res)
 
         }else{
             res.status(500).send({success: false, message:"Invalid User"})
@@ -41,5 +42,49 @@ export const userRegister=async(req,res)=>{
             message: error              
         })
         console.log(error);
+    }
+}
+
+export const userLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(500).send({ success: false, message: "Email doesn't exist in register" });
+        const comparePass = bcrypt.compareSync(password, user.password || "");
+        if (!comparePass) return res.status(500).send({ success: false, message: "Email or password doesn't match" });
+
+        jwtwebToken(user._id, res);
+        res.status(200).send({
+            _id: user._id,
+            fullname: user.fullname,
+            username: user.username,
+            displayPicture: user.displayPicture,
+            email: user.email,
+            message: "Successfully login"
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error
+        });
+        console.log(error);
+
+    }
+}
+
+export const userLogOut=async(req,res)=>{
+    try {
+        res.cookie("jwt",'',{
+            maxAge:0
+        })
+        res.status(200).send({message:"user logout"})
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: error
+        });
+        console.log(error);
+
     }
 }
